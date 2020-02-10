@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div id="maindiv">
+<h1>Disclaimer</h1>
+<p>
+This site is served with limited resources, so it is not guaranteed that it will be stable at all times.
+</p>
+
+<h1>Privacy policy</h1>
+<p>
+This site uses cookies (read about <a href="https://www.allaboutcookies.org/cookies/" target="_blank">what is a cookie</a>)
+to monitor the website traffic and keep some data for improving the user experience. These cookies are not used to
+store personal information. More specifically, this website uses the following cookies:
+</p>
+<ul>
+  <li>Google Analytics: for monitoring the website traffic. These cookies are anonymized (read about
+    <a href="https://support.google.com/analytics/answer/2763052?hl=en" target="_blank">Analytics IP anonymization</a>).</li>
+  <li>Cloudflare: for improving the performance of the website. These cookies are also anonymized (read about
+    <a href="https://support.cloudflare.com/hc/en-us/articles/200170156-What-does-the-Cloudflare-cfduid-cookie-do-#12345682" target="_blank">Cloudflare cookies</a>).</li>
+  <li>Conference choices: for improving the usability. These cookies just store information about
+    which conferences the user selected to filter the similar results.</li>
+</ul>
+
+<p>If you want, you can disable the cookies for this website and it should still work normally, except that it will not remember your choices.</p>
+
+<p>
+The way to disable the cookies depends on the browser you are using, and you should check its respective
+documentation to find the instructions.
+</p>
+
+<h1>Conferences</h1>
+<p>
+Conferences on CV, ML, and AI that provided open access from the last 5 years were selected based on the 
+<a href="https://scholar.google.com/citations?view_op=top_venues&hl=en&vq=eng" target="_blank">ranking from Google Scholar</a>.
+Please do not ask to include more conferences to the list. The choices are restricted to keep the use of resources to a minimum.
+</p>
+<p>
+If you want to use other conferences, you can
+<a href="https://github.com/hmorimitsu/similarpapers" target="_blank">fork the source code</a>
+and run a server with your selection. 
+</p>
+</div>
+
+{% endblock %}

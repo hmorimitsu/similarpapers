@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head_extras %}
+
+<script>
+  // passed in from flask as json
+  let papers = {{ papers | tojson }};
+  let msg = "{{ msg }}";
+  let render_format = "{{ render_format }}";
+  let numresults = "{{ numresults }}";
+  let urlq = ''; // global will be read in to QueryString when load is done
+  let conferences = {{ conferences | tojson }};
+  let include_workshop_papers = {{ include_workshop_papers | tojson }};
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<div id="flashesdiv">
+{% with flashes = get_flashed_messages() %}
+    {% if flashes %}
+      <ul class="flashes">
+      {% for message in flashes %}
+        <li>{{ message }}
+      {% endfor %}
+      </ul>
+    {% endif %}
+{% endwith %}
+</div>
+
+<div id="sbox">
+  <form action="/search" method="get">
+  	<input name="q" type="text" id="qfield">
+  </form>
+  <div id="search_hint"></div>
+</div>
+
+<!-- this div will be rendered into dynamcially at init with JS -->
+<div id="recommend-time-choice" class="centerdiv"></div>
+<div id="conference-year" class="centerdiv"></div>
+<div id="conference-type" class="centerdiv"></div>
+
+<div id="maindiv">
+
+<div id="rtable"></div>
+
+<div id="loadmore">
+  <button id="loadmorebtn">Load more</button>
+</div>
+
+</div>
+
+<br><br><br><br><br><br>
+{% endblock %}

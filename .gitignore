@@ -1,0 +1,10 @@
+tmp/
+pdf/
+txt/
+static/thumbs/
+*.pyc
+*.db
+env/
+data
+*.DS_Store
+*.p
