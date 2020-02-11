@@ -50,12 +50,12 @@ def fetch_papers(db_manager: DBManager,
         papers_meta_list = (
             soup.find_all('div', {'class': 'maincard narrower Oral'}) +
             soup.find_all('div', {'class': 'maincard narrower Poster'}))
+        for i in range(len(papers_meta_list)-1, -1, -1):
+            if papers_meta_list[i].find('a', {'title': 'PDF'}) is None:
+                del papers_meta_list[i]
         titles_list = [flatten_content_list(m.find('div', {'class', 'maincardBody'}).contents) for m in papers_meta_list]
         authors_list = [format_authors(m.find('div', {'class': 'maincardFooter'}).string, conf_year) for m in papers_meta_list]
-        if conf_year in [2019]:
-            page_urls_list = [m.find_all('a')[1].get('href') for m in papers_meta_list]
-        elif conf_year in [2018]:
-            page_urls_list = [m.find_all('a')[2].get('href') for m in papers_meta_list]
+        page_urls_list = [m.find('a', {'title': 'PDF'}).get('href') for m in papers_meta_list]
     elif conf_year in [2017]:
         papers_meta_list = soup.find_all('div', {'class': 'note panel'})
         page_urls_list = ['https://openreview.net' + m.find_all('a')[0].get('href') for m in papers_meta_list]
