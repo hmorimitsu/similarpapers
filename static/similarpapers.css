@@ -1,0 +1,12 @@
+/* body {
+  padding-top: 72px;
+} */
+
+/* Code taken from: https://stackoverflow.com/questions/54164397/bootstrap-4-how-to-make-fixed-top-navbar-disappear-on-scroll/54164579 */
+.navbar {
+  transition: top 0.5s ease;
+}
+
+.navbar-hide {
+  top: -72px;
+}

@@ -55,7 +55,7 @@ function addPapers(num, dynamic) {
         } else {
           let msg = 'You hit the limit of number of papers to show in one result.';
         }
-        root.append('div').classed('msg', true).html(msg);
+        root.append('div').classed('alert alert-primary', true).attr('role', 'alert').html(msg);
         showed_end_msg = true;
       }
       break;
@@ -63,51 +63,49 @@ function addPapers(num, dynamic) {
     pointer_ix++;
 
     let p = papers[ix];
-    let div = root.append('div').classed('apaper', true).attr('id', p.pid);
+    let div = root.append('div').classed('list-group', true).attr('id', p.pid);
 
-    let tdiv = div.append('div').classed('paperdesc', true);
-    tdiv.append('span').classed('ts', true).append('a').attr('href', p.link).attr('target', '_blank').html(p.title);
-    tdiv.append('br');
-    tdiv.append('span').classed('as', true).html(buildAuthorsHtml(p.authors));
-    tdiv.append('br');
+    let headerdiv = div.append('div').classed('bg-light row', true);
+    let infodiv = headerdiv.append('div').classed('col', true);
+    infodiv.append('div').classed('mx-2 my-2', true).append('h4').append('a').classed('text-dark', true).attr('href', p.link).attr('target', '_blank').html(p.title);
+    infodiv.append('div').classed('mx-2 my-1', true).html(buildAuthorsHtml(p.authors));
     let cat_link = '/search?q=' + p.composed_conf_id;
-    res = '<a href="' + cat_link + '">' + p.conf_name + '</a>';
-    tdiv.append('span').classed('cs', true).html(res);
-    tdiv.append('br');
+    res = '<a class="text-danger" href="' + cat_link + '">' + p.conf_name + '</a>';
+    infodiv.append('div').classed('mx-2 my-1', true).html(res);
 
     // action items for each paper
-    let ldiv = div.append('div').classed('dllinks', true);
-    ldiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('pdf');
-    
-
-    // rank by tfidf similarity
-    ldiv.append('br');
-    let similar_span = ldiv.append('span').classed('sim', true).attr('id', 'sim'+p.pid).html('show similar');
-    similar_span.on('click', function(pid){ // attach a click handler to redirect for similarity search
-      return function() {
-        let chosen_confs = accessCookie('confs');
-        if (chosen_confs.length === 0) {
-          chosen_confs = 'all';
+    if(render_format != 'paper' || ix !== 0) {
+      let ldiv = infodiv.append('div').classed('mx-2 my-3', true);
+      // rank by tfidf similarity
+      let similar_btn = ldiv.append('button').classed('btn btn-secondary', true).attr('type', 'submit').attr('id', 'sim'+p.pid).html('Show similar papers');
+      similar_btn.on('click', function(pid){ // attach a click handler to redirect for similarity search
+        return function() {
+          let chosen_confs = accessCookie('confs');
+          if (chosen_confs.length === 0) {
+            chosen_confs = 'all';
+          }
+          window.location.replace('/' + pid + '?confs=' + chosen_confs);
         }
-        window.location.replace('/' + pid + '?confs=' + chosen_confs);
-      }
-    }(p.pid)); // closer over the paper id
+      }(p.pid)); // closer over the paper id
+    }
 
-    ldiv.append('br');
+    let pdfdiv = headerdiv.append('div').classed('col-md-auto my-auto', true);
+    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="fa fa-file-pdf-o fa-3x"></i><br>PDF</center>');
 
-    div.append('div').attr('style', 'clear:both');
+    // col = ldiv.append('div').classed('col-sm', true);
+    // col.append('a').classed('btn btn-secondary', true).attr('href', p.pdf_link).attr('target', '_blank').html('pdf');
 
     if(typeof p.abstract !== 'undefined') {
-      let abdiv = div.append('span').classed('tt', true).html(p.abstract);
+      let abdiv = div.append('div').classed('my-2', true).html(p.abstract);
       if(dynamic) {
-        MathJax.Hub.Queue(["Typeset",MathJax.Hub,abdiv[0]]); //typeset the added paper
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, abdiv[0]]); //typeset the added paper
       }
     }
 
     if(render_format == 'paper' && ix === 0) {
-      let filter_div = div.append('div').classed('paperdivider', true);
+      let filter_div = div.append('div').classed('alert alert-primary', true).attr('role', 'alert');
       fillFilterDiv(filter_div, p);
-      div.append('div').classed('paperdivider', true).html('Most similar papers:');
+      div.append('div').classed('alert alert-primary', true).html('<h4>Most similar papers:</h4>');
     }
   }
 
@@ -139,38 +137,39 @@ function fillFilterDiv(filter_div, paper) {
   let chosen_confs = QueryString.confs;
 
   // add a "Select all" checkbox
-  let select_div = filter_div.append('div').attr('style', 'display: grid; grid-template-columns: 1fr 1fr');
-  let select_cell_div = select_div.append('div').attr('style', 'text-align:center');
+  let select_outer_div = filter_div.append('div').classed('border-bottom border-primary', true)
+  let select_div = select_outer_div.append('div').classed('row', true)
+  let select_cell_div = select_div.append('div').classed('col', true).attr('style', 'text-align:center');
   let check = select_cell_div.append('input')
-    .attr('id', 'allconf_all')
     .attr('type', 'checkbox')
+    .attr('id', 'allconf_all')
     .attr('onClick', 'updateCheckBoxes("all")');
   if (chosen_confs === 'all') {
     check.property('checked', true);
   }
   select_cell_div.append('label').text(' Select all');
 
-  // add a "Select none" checkbox
-  select_cell_div = select_div.append('div').attr('style', 'text-align:center');
+  select_cell_div = select_div.append('div').classed('col', true).attr('style', 'text-align:center');
   check = select_cell_div.append('input')
-    .attr('id', 'allconf_none')
     .attr('type', 'checkbox')
+    .attr('id', 'allconf_none')
     .attr('onClick', 'updateCheckBoxes("none")');
   if (chosen_confs === 'none') {
     check.property('checked', true);
   }
   select_cell_div.append('label').text(' Select none');
-  filter_div.append('hr');
+  // filter_div.append('hr');
 
   // add checkboxes to select by year
   let last_year = 2019;
   let max_years = 5;
-  let col_width = '90px';
-  let conf_div = filter_div.append('div').attr('style', 'display: flex');
-  conf_div.append('div').attr('style', 'width: '+col_width);
+  let max_width = '660px';
+  let conf_outer_div = filter_div.append('div').classed('border-bottom border-primary pt-2', true)
+  let conf_div = conf_outer_div.append('div').classed('row', true).attr('style', 'max-width:'+max_width);
+  conf_div.append('div').classed('col', true);
   for (let j=0; j < max_years; j++) {
     let conf_year = last_year - j;
-    conv_cell = conf_div.append('div').attr('style', 'text-align:center; width: '+col_width);
+    conv_cell = conf_div.append('div').classed('col', true).attr('style', 'text-align:center');
     check = conv_cell.append('input')
       .attr('id', 'yearconf_'+conf_year.toString())
       .attr('type', 'checkbox')
@@ -181,16 +180,17 @@ function fillFilterDiv(filter_div, paper) {
     conv_cell.append('label')
       .html(' ' + conf_year.toString());
   }
-  filter_div.append('hr');
+
   // add checkboxes for each conference
-  conf_div = filter_div.append('div').attr('style', 'display: flex');
+  conf_outer_div = filter_div.append('div').classed('border-bottom border-primary pt-2', true)
+  conf_div = conf_outer_div.append('div').classed('row', true).attr('style', 'max-width:'+max_width);
   let conference_names = Object.keys(conferences);
   for (let i=0; i < conference_names.length; i++) {
     let conf_name = conference_names[i];
     let conference_years = conferences[conf_name][1];
     // add a checkbox with the conference name
-    conf_div = filter_div.append('div').attr('style', 'display: flex');
-    conv_cell = conf_div.append('div').attr('style', 'width: '+col_width+'; border-right: 1px solid gray');
+    conf_div = conf_outer_div.append('div').classed('row', true).attr('style', 'max-width:'+max_width);
+    conv_cell = conf_div.append('div').classed('col border-right border-primary', true);
     check = conv_cell.append('input')
       .attr('id', 'nameconf_'+conf_name.toLowerCase())
       .attr('type', 'checkbox')
@@ -203,7 +203,7 @@ function fillFilterDiv(filter_div, paper) {
     // add checkboxes with the available years of each conference
     for (let j=0; j < max_years; j++) {
       let conf_year = (last_year - j).toString();
-      conv_cell = conf_div.append('div').attr('style', 'text-align:center; width: '+col_width);
+      conv_cell = conf_div.append('div').classed('col', true).attr('style', 'text-align:center');
       if (conference_years.includes(conf_year)) {
         check = conv_cell.append('input')
           .attr('id', 'conf_'+conf_name.toLowerCase()+conf_year)
@@ -217,8 +217,8 @@ function fillFilterDiv(filter_div, paper) {
       }
     }
   }
-  filter_div.append('hr');
-  filter_div.append('input').attr('type', 'submit').attr('onClick', 'updateConfsFilter("'+paper.pid+'")').attr('value', 'Filter results');
+  let button_div = filter_div.append('div').classed('pt-2', true);
+  button_div.append('input').classed('btn btn-secondary', true).attr('type', 'submit').attr('onClick', 'updateConfsFilter("'+paper.pid+'")').attr('value', 'Filter results');
 }
 
 function updateCheckBoxes(mode) {

@@ -10,7 +10,7 @@ $(document).ready(function(){
 
   // display message, if any
   if(msg !== '') {
-    d3.select("#rtable").append('div').classed('msg', true).html(msg);
+    d3.select("#rtable").append('div').classed('alert alert-primary', true).attr('role', 'alert').html(msg);
   }
 
   // add papers to #rtable
@@ -44,40 +44,43 @@ $(document).ready(function(){
   let link_endpoint = '';
 
   // add conference links
-  let elt = d3.select('#recommend-time-choice');
+  let elt = d3.select('#conference-name');
+  let ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
   for(let i=0; i<conference_names.length; i++) {
     let conf_name = conference_names[i];
     let url_text = '/'+link_endpoint+'?'+'conf='+conf_name+'&year='+conferences[conf_name][1][0];
     if (include_workshop_papers) {
       url_text = url_text+'&type='+conferences[conf_name][0][0];
     }
-    let aelt = elt.append('a').attr('href', url_text);
-    let delt = aelt.append('div').classed('timechoice', true).html(conf_name);
-    if(typeof chosen_conf !== 'undefined' && chosen_conf === conf_name) { delt.classed('timechoice-selected', true); } // also render as chosen
+    let li = ul.append('li').attr('class', 'nav-item px-1');
+    let aelt = li.append('a').attr('href', url_text).classed('btn btn-outline-primary', true).html(conf_name);
+    if(typeof chosen_conf !== 'undefined' && chosen_conf === conf_name) { aelt.classed('active', true); } // also render as chosen
   }
   if(typeof chosen_conf !== 'undefined') {
     let conference_years = conferences[chosen_conf][1];
     // add conference years links
     elt = d3.select('#conference-year');
+    ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
     for(let i=0;i<conference_years.length;i++) {
       let year = conference_years[i];
       let url_text = '/'+link_endpoint+'?'+'conf='+chosen_conf+'&year='+year;
       if (include_workshop_papers) {
         url_text = url_text+'&type='+conferences[chosen_conf][0][0];
       }
-      let aelt = elt.append('a').attr('href', url_text);
-      let delt = aelt.append('div').classed('timechoice', true).html(year);
-      if(typeof chosen_year !== 'undefined' && chosen_year === year) { delt.classed('timechoice-selected', true); } // also render as chosen
+      let li = ul.append('li').attr('class', 'nav-item px-1');
+      let aelt = li.append('a').attr('href', url_text).classed('btn btn-outline-primary', true).html(year);
+      if(typeof chosen_year !== 'undefined' && chosen_year === year) { aelt.classed('active', true); } // also render as chosen
     }
     // add links to main and workshop papers
     if (include_workshop_papers && typeof chosen_year !== 'undefined') {
       let conference_types = conferences[chosen_conf][0];
       elt = d3.select('#conference-type');
+      ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
       for(let i=0;i<conference_types.length;i++) {
         let ctype = conference_types[i];
-        let aelt = elt.append('a').attr('href', '/'+link_endpoint+'?'+'conf='+chosen_conf+'&year='+chosen_year+'&type='+ctype);
-        let delt = aelt.append('div').classed('timechoice', true).html(ctype);
-        if(chosen_type === ctype) { delt.classed('timechoice-selected', true); } // also render as chosen
+        let li = ul.append('li').attr('class', 'nav-item px-1');
+        let aelt = li.append('a').attr('href', '/'+link_endpoint+'?'+'conf='+chosen_conf+'&year='+chosen_year+'&type='+ctype).classed('btn btn-outline-primary', true).html(ctype);
+        if(chosen_type === ctype) { aelt.classed('active', true); } // also render as chosen
       }
     }
   }
