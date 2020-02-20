@@ -4,14 +4,14 @@ Click==7.0
 Flask==1.1.1
 Flask-Limiter==1.1.0
 itsdangerous==1.1.0
-Jinja2==2.10.3
+Jinja2==2.11.1
 limits==1.5
 MarkupSafe==1.1.1
 numpy==1.18.1
 pbr==5.4.4
 python-dateutil==2.8.1
-six==1.13.0
-Werkzeug==0.16.0
+six==1.14.0
+Werkzeug==1.0.0
 # Required if hosting with gunicorn
 gunicorn==20.0.4
 # Required to run other py scripts
@@ -19,4 +19,4 @@ beautifulsoup4==4.8.2
 scikit-learn==0.22.1
 scipy==1.4.1
 soupsieve==1.9.5
-tqdm==4.42.1
+tqdm==4.43.0
