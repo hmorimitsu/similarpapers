@@ -101,8 +101,8 @@ class DBManager(object):
         if len(pdf_url) == 0:
             print('Incorrect pdf_url')
             is_correct = False
-        if len(summary) > 0 and len(summary) < 100:
-            print('Incorrect summary (abstract). It must be either an empty string or have more than 100 characters')
+        if len(summary) > 0 and len(summary) < 50:
+            print('Incorrect summary (abstract). It must be either an empty string or have more than 50 characters')
             is_correct = False
         if not is_correct:
             print('Incorrect value found when processing ' + pdf_url)
