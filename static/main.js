@@ -48,24 +48,26 @@ $(document).ready(function(){
   let ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
   for(let i=0; i<conference_names.length; i++) {
     let conf_name = conference_names[i];
-    let url_text = '/'+link_endpoint+'?'+'conf='+conf_name+'&year='+conferences[conf_name][1][0];
+    let conference_years = Object.keys(conferences[conf_name])
+    let conf_year = conference_years[conference_years.length - 1]
+    let url_text = '/'+link_endpoint+'?'+'conf='+conf_name+'&year='+conf_year;
     if (include_workshop_papers) {
-      url_text = url_text+'&type='+conferences[conf_name][0][0];
+      url_text = url_text+'&type='+conferences[conf_name][conf_year][0];
     }
     let li = ul.append('li').attr('class', 'nav-item px-1');
     let aelt = li.append('a').attr('href', url_text).classed('btn btn-outline-primary', true).html(conf_name);
     if(typeof chosen_conf !== 'undefined' && chosen_conf === conf_name) { aelt.classed('active', true); } // also render as chosen
   }
   if(typeof chosen_conf !== 'undefined') {
-    let conference_years = conferences[chosen_conf][1];
+    let conference_years = Object.keys(conferences[chosen_conf]);
     // add conference years links
     elt = d3.select('#conference-year');
     ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
-    for(let i=0;i<conference_years.length;i++) {
+    for(let i=conference_years.length-1; i>=0; i--) {
       let year = conference_years[i];
       let url_text = '/'+link_endpoint+'?'+'conf='+chosen_conf+'&year='+year;
       if (include_workshop_papers) {
-        url_text = url_text+'&type='+conferences[chosen_conf][0][0];
+        url_text = url_text+'&type='+conferences[chosen_conf][year][0];
       }
       let li = ul.append('li').attr('class', 'nav-item px-1');
       let aelt = li.append('a').attr('href', url_text).classed('btn btn-outline-primary', true).html(year);
@@ -73,10 +75,10 @@ $(document).ready(function(){
     }
     // add links to main and workshop papers
     if (include_workshop_papers && typeof chosen_year !== 'undefined') {
-      let conference_types = conferences[chosen_conf][0];
+      let conference_types = conferences[chosen_conf][chosen_year];
       elt = d3.select('#conference-type');
       ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
-      for(let i=0;i<conference_types.length;i++) {
+      for(let i=0; i<conference_types.length; i++) {
         let ctype = conference_types[i];
         let li = ul.append('li').attr('class', 'nav-item px-1');
         let aelt = li.append('a').attr('href', '/'+link_endpoint+'?'+'conf='+chosen_conf+'&year='+chosen_year+'&type='+ctype).classed('btn btn-outline-primary', true).html(ctype);

@@ -96,11 +96,11 @@ def gen_conferences_dict(conf_ids_list):
             is_workshop = True
             cid = cid[:-1]
         try:
-            year = int(cid[-4:])
+            year = str(int(cid[-4:]))
             conf_name = cid[:-4]
         except ValueError:
             try:
-                year = int(cid[-2:])
+                year = str(int(cid[-2:]))
                 conf_name = cid[:-2]
             except ValueError:
                 raise ValueError('Cannot find year in conference ID.')
@@ -108,17 +108,27 @@ def gen_conferences_dict(conf_ids_list):
         if is_workshop:
             type_str = 'Workshop'
         if conf_dict.get(conf_name) is None:
-            conf_dict[conf_name] = [{type_str}, {str(year)}]
+            conf_dict[conf_name] = {year: set([type_str])}
         else:
-            if type_str not in conf_dict[conf_name][0]:
-                conf_dict[conf_name][0].add(type_str)
-            conf_dict[conf_name][1].add(str(year))
-    for conf_name in conf_dict:
-        conf_dict[conf_name] = [
-            sorted([x for x in conf_dict[conf_name][0]]),
-            sorted([y for y in conf_dict[conf_name][1]], reverse=True)
-        ]
-    return conf_dict
+            if conf_dict[conf_name].get(year) is None:
+                conf_dict[conf_name][year] = set([type_str])
+            else:
+                conf_dict[conf_name][year].add(type_str)
+
+    # Ensures that 'Main' will be the first element after sorting
+    def conf_type_sort_idx(type_str):
+        if type_str.lower() == 'main':
+            return '0'
+        return type_str
+
+    sorted_conf_dict = {}
+    sorted_names = sorted(list(conf_dict))
+    for conf_name in sorted_names:
+        sorted_conf_dict[conf_name] = {}
+        sorted_years = sorted(list(conf_dict[conf_name]))
+        for year in sorted_years:
+            sorted_conf_dict[conf_name][year] = sorted(conf_dict[conf_name][year], key=lambda x: conf_type_sort_idx(x))
+    return sorted_conf_dict
 
 
 # -----------------------------------------------------------------------------
@@ -140,10 +150,15 @@ def default_context(papers, **kws):
 def intmain():
     conf_str = request.args.get('conf', None)
     year_str = request.args.get('year', None)
-    if conf_str is None:
-        return redirect(url_for('intmain', conf=MOST_RECENT_CONFERENCE, year=CONFERENCES[MOST_RECENT_CONFERENCE][1][0]))
-    elif year_str is None:
-        return redirect(url_for('intmain', conf=conf_str, year=CONFERENCES[conf_str][1][0]))
+    type_str = request.args.get('year', None)
+    if conf_str is None or year_str is None:
+        if conf_str is None:
+            conf_str = MOST_RECENT_CONFERENCE
+        if year_str is None:
+            year_str = list(CONFERENCES[conf_str])[-1]
+        if type_str is None:
+            type_str = 'Main'
+        return redirect(url_for('intmain', conf=MOST_RECENT_CONFERENCE, year=year_str, type=type_str))
     else:
         suffix = '' if request.args.get('type', 'Main').lower() == 'main' else 'W'
         papers = [db[pid] for pid in CONFERENCE_SORTED_PIDS[conf_str+year_str+suffix]] # precomputed

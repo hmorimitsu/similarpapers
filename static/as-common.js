@@ -187,7 +187,7 @@ function fillFilterDiv(filter_div, paper) {
   let conference_names = Object.keys(conferences);
   for (let i=0; i < conference_names.length; i++) {
     let conf_name = conference_names[i];
-    let conference_years = conferences[conf_name][1];
+    let conference_years = Object.keys(conferences[conf_name]);
     // add a checkbox with the conference name
     conf_div = conf_outer_div.append('div').classed('row', true).attr('style', 'max-width:'+max_width);
     conv_cell = conf_div.append('div').classed('col border-right border-primary', true);
