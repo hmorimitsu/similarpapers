@@ -48,8 +48,8 @@ $(document).ready(function(){
   let ul = elt.append('ul').attr('class', 'navbar-nav mx-auto');
   for(let i=0; i<conference_names.length; i++) {
     let conf_name = conference_names[i];
-    let conference_years = Object.keys(conferences[conf_name])
-    let conf_year = conference_years[conference_years.length - 1]
+    let conference_years = Object.keys(conferences[conf_name]);
+    let conf_year = conference_years[conference_years.length - 1];
     let url_text = '/'+link_endpoint+'?'+'conf='+conf_name+'&year='+conf_year;
     if (include_workshop_papers) {
       url_text = url_text+'&type='+conferences[conf_name][conf_year][0];
