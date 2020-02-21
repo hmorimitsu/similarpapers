@@ -150,15 +150,15 @@ def default_context(papers, **kws):
 def intmain():
     conf_str = request.args.get('conf', None)
     year_str = request.args.get('year', None)
-    type_str = request.args.get('year', None)
-    if conf_str is None or year_str is None:
-        if conf_str is None:
+    type_str = request.args.get('type', None)
+    if conf_str not in CONFERENCES or year_str not in CONFERENCES[conf_str] or type_str not in CONFERENCES[conf_str][year_str]:
+        if conf_str not in CONFERENCES:
             conf_str = MOST_RECENT_CONFERENCE
-        if year_str is None:
+        if year_str not in CONFERENCES[conf_str]:
             year_str = list(CONFERENCES[conf_str])[-1]
-        if type_str is None:
+        if type_str not in CONFERENCES[conf_str][year_str]:
             type_str = 'Main'
-        return redirect(url_for('intmain', conf=MOST_RECENT_CONFERENCE, year=year_str, type=type_str))
+        return redirect(url_for('intmain', conf=conf_str, year=year_str, type=type_str))
     else:
         suffix = '' if request.args.get('type', 'Main').lower() == 'main' else 'W'
         papers = [db[pid] for pid in CONFERENCE_SORTED_PIDS[conf_str+year_str+suffix]] # precomputed
