@@ -67,7 +67,11 @@ function addPapers(num, dynamic) {
 
     let headerdiv = div.append('div').classed('bg-light row', true);
     let infodiv = headerdiv.append('div').classed('col', true);
-    infodiv.append('div').classed('mx-2 my-2', true).append('h4').append('a').classed('text-dark', true).attr('href', p.link).attr('target', '_blank').html(p.title);
+    if (p.link.length > 1) {
+      infodiv.append('div').classed('mx-2 my-2', true).append('h4').append('a').classed('text-dark', true).attr('href', p.link).attr('target', '_blank').html(p.title);
+    } else {
+      infodiv.append('div').classed('mx-2 my-2', true).append('h4').classed('text-dark', true).html(p.title);
+    }
     infodiv.append('div').classed('mx-2 my-1', true).html(buildAuthorsHtml(p.authors));
     let cat_link = '/search?q=' + p.composed_conf_id;
     res = '<a class="text-danger" href="' + cat_link + '">' + p.conf_name + '</a>';
