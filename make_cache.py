@@ -28,9 +28,6 @@ idf = meta['idf']
 
 print('decorating the database with additional information...')
 for pid,p in db.items():
-    timestruct = dateutil.parser.parse(p['published'])
-    p['time_published'] = int(timestruct.strftime("%s")) # store in struct for future convenience
-
     p['pid'] = pid
     p['conf_id'] = p['conf_id'] + ('W' if p['is_workshop'] else '')
     p['composed_conf_id'] = p['conf_id'] + ('_'+p['conf_sub_id'] if p['is_workshop'] else '')
@@ -43,17 +40,13 @@ for pid,p in db.items():
     tt = time.mktime(dateutil.parser.parse(p['published']).timetuple())
     p['tscore'] = (tt-ttmin)/(ttmax-ttmin+1)
 
-print('precomputing papers date sorted...')
-scores = [(p['time_published'], pid) for pid,p in db.items()]
-scores.sort(reverse=True, key=lambda x: x[0])
-CACHE['date_sorted_pids'] = [sp[1] for sp in scores]
-
-composed_conference_ids = set([p['conf_id'] for pid,p in db.items()])
-print('composed_conference_ids')
-print(composed_conference_ids)
+print('precomputing conference data...')
+composed_conference_ids = set([(p['conf_id'], dateutil.parser.parse(p['published'])) for pid,p in db.items()])
 CACHE['conference_sorted_pids'] = {
-    cid: [pid for pid,p in db.items() if p['conf_id'] == cid] for cid in composed_conference_ids
+    cid[0]: [pid for pid,p in db.items() if p['conf_id'] == cid[0]] for cid in composed_conference_ids
 }
+composed_conference_ids = sorted(list(composed_conference_ids), key=lambda x: x[1], reverse=True)
+CACHE['most_recent_conference_name'] = composed_conference_ids[0][0][:-4]
 
 # some utilities for creating a search index for faster search
 punc = "'!\"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~'" # removed hyphen from string.punctuation

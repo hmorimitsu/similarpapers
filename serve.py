@@ -216,12 +216,11 @@ sim_dict = pickle.load(open(Config.sim_path, "rb"))
 
 print('loading serve cache...', Config.serve_cache_path)
 cache = pickle.load(open(Config.serve_cache_path, "rb"))
-DATE_SORTED_PIDS = cache['date_sorted_pids']
 CONFERENCE_SORTED_PIDS = cache['conference_sorted_pids']
 SEARCH_DICT = cache['search_dict']
 
 CONFERENCES = gen_conferences_dict(list(cache['conference_sorted_pids']))
-MOST_RECENT_CONFERENCE = sorted(list(CONFERENCES))[0]
+MOST_RECENT_CONFERENCE = cache['most_recent_conference_name']
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
