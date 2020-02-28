@@ -96,8 +96,7 @@ class DBManager(object):
                 print('Author name cannot be empty')
                 is_correct = False
         if len(page_url) == 0:
-            print('page_url cannot be empty')
-            is_correct = False
+            print('Warning: page_url is empty')
         if len(pdf_url) == 0:
             print('Incorrect pdf_url')
             is_correct = False
