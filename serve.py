@@ -141,7 +141,12 @@ def default_context(papers, **kws):
     # prompt logic
     show_prompt = 'no'
 
-    ans = dict(papers=top_papers, numresults=len(papers), totpapers=len(db), msg='', show_prompt=show_prompt, pid_to_users={})
+    ans = dict(
+        papers=top_papers, numresults=len(papers), totpapers=len(db), 
+        msg='', show_prompt=show_prompt, pid_to_users={},
+        conferences=CONFERENCES, include_workshop_papers=Config.include_workshop_papers,
+        newest_conference_year=NEWEST_CONFERENCE_YEAR,
+        oldest_conference_year=OLDEST_CONFERENCE_YEAR)
     ans.update(kws)
     return ans
 
@@ -163,9 +168,7 @@ def intmain():
         suffix = '' if request.args.get('type', 'Main').lower() == 'main' else 'W'
         papers = [db[pid] for pid in CONFERENCE_SORTED_PIDS[conf_str+year_str+suffix]] # precomputed
         ctx = default_context(
-            papers, render_format='recent', msg='Showing papers from {:}{:} {:}'.format(conf_str, suffix, year_str),
-            conferences=CONFERENCES,
-            include_workshop_papers=Config.include_workshop_papers)
+            papers, render_format='recent', msg='Showing papers from {:}{:} {:}'.format(conf_str, suffix, year_str))
         return render_template('main.html', **ctx)
 
 
@@ -176,9 +179,7 @@ def rank(request_pid=None):
     confs_filter = request.args.get('confs', None)
     papers = papers_similar(request_pid, confs_filter)
     ctx = default_context(
-        papers, render_format='paper',
-        conferences=CONFERENCES,
-        include_workshop_papers=Config.include_workshop_papers)
+        papers, render_format='paper')
     return render_template('main.html', **ctx)
 
 
@@ -188,9 +189,7 @@ def search():
     papers = papers_search(q) # perform the query and get sorted documents
     ctx = default_context(
         papers, render_format='search',
-        msg='Showing search results',
-        conferences=CONFERENCES,
-        include_workshop_papers=Config.include_workshop_papers)
+        msg='Showing search results')
     return render_template('main.html', **ctx)
 
 
@@ -198,9 +197,7 @@ def search():
 def info():
     ctx = default_context(
         [], render_format='search',
-        msg='Showing search results',
-        conferences=CONFERENCES,
-        include_workshop_papers=Config.include_workshop_papers)
+        msg='Showing search results')
     return render_template('info.html', **ctx)
 
 print('loading the paper database', Config.db_serve_path)
@@ -221,6 +218,8 @@ SEARCH_DICT = cache['search_dict']
 
 CONFERENCES = gen_conferences_dict(list(cache['conference_sorted_pids']))
 MOST_RECENT_CONFERENCE = cache['most_recent_conference_name']
+NEWEST_CONFERENCE_YEAR = cache['newest_conference_year']
+OLDEST_CONFERENCE_YEAR = cache['oldest_conference_year']
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -47,6 +47,8 @@ CACHE['conference_sorted_pids'] = {
 }
 composed_conference_ids = sorted(list(composed_conference_ids), key=lambda x: x[1], reverse=True)
 CACHE['most_recent_conference_name'] = composed_conference_ids[0][0][:-4]
+CACHE['newest_conference_year'] = composed_conference_ids[0][1].strftime('%Y')
+CACHE['oldest_conference_year'] = composed_conference_ids[-1][1].strftime('%Y')
 
 # some utilities for creating a search index for faster search
 punc = "'!\"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~'" # removed hyphen from string.punctuation

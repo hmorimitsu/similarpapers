@@ -153,6 +153,7 @@ function fillFilterDiv(filter_div, paper) {
   }
   select_cell_div.append('label').text(' Select all');
 
+  // add a "Select none" checkbox
   select_cell_div = select_div.append('div').classed('col', true).attr('style', 'text-align:center');
   check = select_cell_div.append('input')
     .attr('type', 'checkbox')
@@ -162,12 +163,11 @@ function fillFilterDiv(filter_div, paper) {
     check.property('checked', true);
   }
   select_cell_div.append('label').text(' Select none');
-  // filter_div.append('hr');
 
   // add checkboxes to select by year
-  let last_year = 2019;
-  let max_years = 5;
-  let max_width = '660px';
+  let last_year = newest_conference_year;
+  let max_years = newest_conference_year - oldest_conference_year + 1;
+  let max_width = '770px';
   let conf_outer_div = filter_div.append('div').classed('border-bottom border-primary pt-2', true)
   let conf_div = conf_outer_div.append('div').classed('row', true).attr('style', 'max-width:'+max_width);
   conf_div.append('div').classed('col', true);

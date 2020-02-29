@@ -11,6 +11,8 @@
   let urlq = ''; // global will be read in to QueryString when load is done
   let conferences = {{ conferences | tojson }};
   let include_workshop_papers = {{ include_workshop_papers | tojson }};
+  let newest_conference_year = {{ newest_conference_year | tojson }}
+  let oldest_conference_year = {{ oldest_conference_year | tojson }}
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
 {% endblock %}
