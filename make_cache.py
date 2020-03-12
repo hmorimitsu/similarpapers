@@ -10,12 +10,12 @@ import time
 import pickle
 import dateutil.parser
 
-from utils import safe_pickle_dump, Config
+from utils import safe_pickle_dump, Config, load_json_db
 
 CACHE = {}
 
-print('loading the paper database', Config.db_path)
-db = pickle.load(open(Config.db_path, 'rb'))
+print('loading the paper database from json files in', Config.json_dir)
+db = load_json_db()
 
 db = {pid: p for pid,p in db.items() if int(dateutil.parser.parse(p['published']).strftime('%Y')) >= Config.minimum_year}
 if not Config.include_workshop_papers:

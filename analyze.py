@@ -11,7 +11,7 @@ from random import shuffle, seed
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from utils import Config, safe_pickle_dump
+from utils import Config, safe_pickle_dump, load_json_db
 
 PidConf = namedtuple('PidConf', 'pid, name, year, subid')
 
@@ -20,7 +20,7 @@ max_train = 25000  # max number of tfidf training documents (chosen randomly), f
 max_features = 5000
 
 # read database
-db = pickle.load(open(Config.db_path, 'rb'))
+db = load_json_db()
 
 # read all text files for all papers into memory
 txt_paths, pids = [], []
@@ -144,7 +144,7 @@ print("precomputing nearest neighbor queries in batches...")
 X = X.todense() # originally it's a sparse matrix
 sim_dict = {}
 batch_size = 200
-top_k = 200
+top_k = 500
 top_k_by_conf = 50
 for i in range(0, len(pids), batch_size):
     i1 = min(len(pids), i+batch_size)

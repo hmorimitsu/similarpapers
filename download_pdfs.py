@@ -7,7 +7,7 @@ import random
 from  urllib.request import urlopen
 
 sys.path.append('../')
-from utils import Config
+from utils import Config, load_json_db
 
 timeout_secs = 10 # after this many seconds we give up on a paper
 have = []
@@ -27,7 +27,7 @@ print('Have {:d} PDFs in our data folder'.format(len(have)))
 os.makedirs('tmp', exist_ok=True)
 numok = 0
 numtot = 0
-db = pickle.load(open(Config.db_path, 'rb'))
+db = load_json_db()
 db_keys = list(db)
 random.shuffle(db_keys)
 for key in db_keys:

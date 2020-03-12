@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 
+import json
 import os
 import pickle
 import tempfile
@@ -28,6 +29,8 @@ class Config(object):
     # sql database file
     db_serve_path = os.path.join(ROOT_DIR, 'db2{:}.p'.format(suffix))  # an enriched db.p with various preprocessing info
     serve_cache_path = os.path.join(ROOT_DIR, 'serve_cache{:}.p'.format(suffix))
+    # papers JSON metadata
+    json_dir = os.path.join(ROOT_DIR, 'data', 'json')
 
     tmp_dir = 'tmp'
 
@@ -95,3 +98,27 @@ def safe_pickle_dump(obj, fname):
 
 def isvalidid(pid):
     return 'favicon' not in pid
+
+
+def dump_db_as_json(db):
+    extended_conference_ids = set()
+    for _, p in db.items():
+        extended_conference_ids.add(p['conf_id'] + ('W' if p['is_workshop'] else ''))
+
+    os.makedirs(Config.json_dir, exist_ok=True)
+    for ext_conf_id in extended_conference_ids:
+        conf_id = ext_conf_id[:-1] if ext_conf_id.lower().endswith('w') else ext_conf_id
+        conf_db = {pid: p for pid, p in db.items() if p['conf_id'] == conf_id}
+        json.dump(
+            conf_db,
+            open(os.path.join(Config.json_dir, ext_conf_id+'.json'), 'w'),
+            indent=2)
+
+
+def load_json_db():
+    json_files = [f for f in os.listdir(Config.json_dir) if f.endswith('.json')]
+    db = {}
+    for jf in json_files:
+        json_content = json.load(open(os.path.join(Config.json_dir, jf), 'r'))
+        db.update(json_content)
+    return db

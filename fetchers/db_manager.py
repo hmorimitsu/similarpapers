@@ -1,10 +1,9 @@
-import pickle
 import sys
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import List
 
 sys.path.append('../')
-from utils import Config, safe_pickle_dump
+from utils import dump_db_as_json, load_json_db
 
 
 class DBManager(object):
@@ -16,7 +15,7 @@ class DBManager(object):
 
         # lets load the existing database to memory
         try:
-            self.db = pickle.load(open(Config.db_path, 'rb'))
+            self.db = load_json_db()
         except Exception as e:
             print('error loading existing database:')
             print(e)
@@ -131,5 +130,5 @@ class DBManager(object):
 
     def write_db(self) -> None:
         """ Writes database to disk. """
-        print('Saving db to disk with {:d} entries'.format(len(self.db)))
-        safe_pickle_dump(self.db, Config.db_path)
+        print('Saving db as JSON to disk with {:d} entries'.format(len(self.db)))
+        dump_db_as_json(self.db)
