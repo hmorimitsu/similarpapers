@@ -5,6 +5,18 @@ This code is a modification of the nice [arxiv-sanity](https://github.com/karpat
 
 ![user interface](ui.jpg)
 
+### Getting the code
+
+If you just want to download the source code, then you can clone this repository with:
+```bash
+git clone https://github.com/hmorimitsu/similarpapers.git
+```
+
+However, if you want to download the source code and the metadata of the conference papers, then clone recursively with:
+```bash
+git clone https://github.com/hmorimitsu/similarpapers.git --recurse-submodules
+```
+
 ### Code layout
 
 It is mostly similar to the arxiv-sanity code. The explanation below is based on the arxiv-sanity one, with some modifications.
