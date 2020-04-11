@@ -1,0 +1,3 @@
+[submodule "data/json"]
+	path = data/json
+	url = https://github.com/hmorimitsu/similarpapers_json_database.git
