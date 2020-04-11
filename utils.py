@@ -109,10 +109,8 @@ def dump_db_as_json(db):
     for ext_conf_id in extended_conference_ids:
         conf_id = ext_conf_id[:-1] if ext_conf_id.lower().endswith('w') else ext_conf_id
         conf_db = {pid: p for pid, p in db.items() if p['conf_id'] == conf_id}
-        json.dump(
-            conf_db,
-            open(os.path.join(Config.json_dir, ext_conf_id+'.json'), 'w'),
-            indent=2)
+        with open_atomic(os.path.join(Config.json_dir, ext_conf_id+'.json'), 'w') as f:
+            json.dump(conf_db, f, indent=2)
 
 
 def load_json_db():
