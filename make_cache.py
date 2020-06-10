@@ -46,7 +46,10 @@ CACHE['conference_sorted_pids'] = {
     cid[0]: [pid for pid,p in db.items() if p['conf_id'] == cid[0]] for cid in composed_conference_ids
 }
 composed_conference_ids = sorted(list(composed_conference_ids), key=lambda x: x[1], reverse=True)
-CACHE['most_recent_conference_name'] = composed_conference_ids[0][0][:-4]
+most_recent_conference_idx = composed_conference_ids[0][0]
+if most_recent_conference_idx.endswith('W'):
+    most_recent_conference_idx = most_recent_conference_idx[:-1]
+CACHE['most_recent_conference_name'] = most_recent_conference_idx[:-4]
 CACHE['newest_conference_year'] = composed_conference_ids[0][1].strftime('%Y')
 CACHE['oldest_conference_year'] = composed_conference_ids[-1][1].strftime('%Y')
 
