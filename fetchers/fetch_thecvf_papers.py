@@ -1,21 +1,20 @@
 import bs4
 import datetime
 import dateutil.parser
-import sys
 import urllib.request
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from typing import List
 
-sys.path.append('../')
 from db_manager import DBManager
 
 CONFERENCES = [
-    'CVPR2019', 'ICCV2019', 'CVPR2018', 'ECCV2018', 'CVPR2017', 'ICCV2017',
-    'CVPR2016', 'CVPR2015', 'ICCV2015',
-    'CVPR2019_workshops', 'ICCV2019_workshops', 'CVPR2018_workshops',
-    'ECCV2018_workshops', 'CVPR2017_workshops', 'ICCV2017_workshops',
-    'CVPR2016_workshops', 'CVPR2015_workshops', 'ICCV2015_workshops'
+    'CVPR2020', 'CVPR2019', 'CVPR2018', 'CVPR2017', 'CVPR2016', 'CVPR2015',
+    'ICCV2019', 'ICCV2017', 'ICCV2015',
+    'ECCV2018',
+    'CVPR2020_workshops', 'CVPR2019_workshops', 'CVPR2018_workshops', 'CVPR2017_workshops', 'CVPR2016_workshops', 'CVPR2015_workshops',
+    'ICCV2019_workshops', 'ICCV2017_workshops', 'ICCV2015_workshops',
+    'ECCV2018_workshops'
 ]
 
 
