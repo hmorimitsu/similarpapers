@@ -1,22 +1,22 @@
 # Required for serve.py
-certifi==2019.11.28
-Click==7.0
-Flask==1.1.1
-Flask-Limiter==1.1.0
+certifi==2020.6.20
+click==7.1.2
+Flask==1.1.2
+Flask-Limiter==1.4
 itsdangerous==1.1.0
-Jinja2==2.11.1
-limits==1.5
+Jinja2==2.11.2
+limits==1.5.1
 MarkupSafe==1.1.1
-numpy==1.18.1
-pbr==5.4.4
+numpy==1.19.1
+pbr==5.4.5
 python-dateutil==2.8.1
-six==1.14.0
-Werkzeug==1.0.0
+six==1.15.0
+Werkzeug==1.0.1
 # Required if hosting with gunicorn
 gunicorn==20.0.4
 # Required to run other py scripts
-beautifulsoup4==4.8.2
-scikit-learn==0.22.1
-scipy==1.4.1
-soupsieve==1.9.5
-tqdm==4.43.0
+beautifulsoup4==4.9.1
+scikit-learn==0.23.2
+scipy==1.5.2
+soupsieve==2.0.1
+tqdm==4.48.2
