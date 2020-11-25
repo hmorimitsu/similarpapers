@@ -9,15 +9,9 @@ from typing import List
 sys.path.append('../')
 from db_manager import DBManager
 
-# This fetcher may be deprecated, since neurips website changed its style.
-# Probably, the papers need to be fetched with fetch_neurips_papers_v2.py.
 
-CONF_LINKS = ['book/advances-in-neural-information-processing-systems-32-2019',
-              'book/advances-in-neural-information-processing-systems-32-2018',
-              'book/advances-in-neural-information-processing-systems-32-2017',
-              'book/advances-in-neural-information-processing-systems-32-2016',
-              'book/advances-in-neural-information-processing-systems-32-2015']
-CONF_NAMES = ['NeurIPS2019', 'NeurIPS2018', 'NeurIPS2017', 'NeurIPS2016', 'NeurIPS2015']
+CONF_LINKS = ['paper/2020']
+CONF_NAMES = ['NeurIPS2020']
 
 
 def main() -> None:
@@ -44,10 +38,10 @@ def fetch_papers(db_manager: DBManager,
     with urllib.request.urlopen(list_url) as url:
         response = url.read()
     soup = BeautifulSoup(response, 'html.parser')
-    papers_meta_list = soup.find('div', {'class', 'main-container'}).find_all('li')
-    page_urls_list = [base_url + m.find_all('a')[0].get('href') for m in papers_meta_list]
-    titles_list = [str(m.find_all('a')[0].string) for m in papers_meta_list]
-    authors_list = [format_authors(m.find_all('a')[1:]) for m in papers_meta_list]
+    papers_meta_list = soup.find('div', {'class', 'container-fluid'}).find_all('li')
+    page_urls_list = [base_url + m.find('a').get('href') for m in papers_meta_list]
+    titles_list = [str(m.find('a').string) for m in papers_meta_list]
+    authors_list = [format_authors(m.find('i').string) for m in papers_meta_list]
     conf_date = dateutil.parser.parse(conf_id[-4:] + '-12')
 
     if (len(page_urls_list) == len(titles_list) and
@@ -59,8 +53,14 @@ def fetch_papers(db_manager: DBManager,
                     with urllib.request.urlopen(page_url) as url:
                         response2 = url.read()
                     soup2 = BeautifulSoup(response2, 'html.parser')
-                    pdf_url = base_url + soup2.find('div', {'class', 'main-container'}).find_all('a')[1].get('href')
-                    summary = flatten_content_list(soup2.find('p', {'class': 'abstract'}).contents)
+                    pdf_url = soup2.find('div', {'class', 'container-fluid'}).find_all('a')
+                    pdf_url = [p.get('href') for p in pdf_url]
+                    pdf_url = base_url + [p for p in pdf_url if p.lower().endswith('paper.pdf')][0]
+                    summary = soup2.find('div', {'class', 'container-fluid'}).find_all('p')[-1]
+                    summary = flatten_content_list(summary.contents)
+                    print(titles_list[i])
+                    print(authors_list[i])
+                    print(page_urls_list[i])
                     print(pdf_url)
                     print(summary)
                     db_manager.add_paper(
@@ -84,15 +84,17 @@ def flatten_content_list(content_list: List[bs4.element.NavigableString]) -> str
         while len(stack) > 0:
             tag = stack.pop()
             if tag.string is not None:
-                out += tag.string.replace('\n', ' ').replace('  ', '')
+                out += tag.string.replace('\n', ' ').replace('  ', '').replace('<p>', '').replace('</p>', '')
             else:
                 stack.extend(tag.contents)
     return out
 
 
-def format_authors(authors: List[bs4.element.Tag]) -> List[str]:
+def format_authors(authors: str) -> List[str]:
     """ Tranforms the raw authors string into a list of authors. """
-    authors_out = [a.string.strip() for a in authors]
+    authors = authors.replace('  ', ' ').replace(', ', ',')
+    authors = authors.split(',')
+    authors_out = [a.strip() for a in authors]
     return authors_out
 
 
