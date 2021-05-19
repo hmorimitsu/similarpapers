@@ -107,8 +107,9 @@ def dump_db_as_json(db):
 
     os.makedirs(Config.json_dir, exist_ok=True)
     for ext_conf_id in extended_conference_ids:
-        conf_id = ext_conf_id[:-1] if ext_conf_id.lower().endswith('w') else ext_conf_id
-        conf_db = {pid: p for pid, p in db.items() if p['conf_id'] == conf_id}
+        is_workshop = ext_conf_id.lower().endswith('w')
+        conf_id = ext_conf_id[:-1] if is_workshop else ext_conf_id
+        conf_db = {pid: p for pid, p in db.items() if p['conf_id'] == conf_id and p['is_workshop'] == is_workshop}
         with open_atomic(os.path.join(Config.json_dir, ext_conf_id+'.json'), 'w') as f:
             json.dump(conf_db, f, indent=2)
 
