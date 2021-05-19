@@ -16,7 +16,7 @@ from utils import Config, safe_pickle_dump, load_json_db
 PidConf = namedtuple('PidConf', 'pid, name, year, subid')
 
 seed(1337)
-max_train = 25000  # max number of tfidf training documents (chosen randomly), for memory efficiency
+max_train = 50000  # max number of tfidf training documents (chosen randomly), for memory efficiency
 max_features = 5000
 
 # read database
