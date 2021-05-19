@@ -12,9 +12,11 @@ CONFERENCES = [
     'CVPR2020', 'CVPR2019', 'CVPR2018', 'CVPR2017', 'CVPR2016', 'CVPR2015',
     'ICCV2019', 'ICCV2017', 'ICCV2015',
     'ECCV2018',
+    'WACV2021', 'WACV2020',
     'CVPR2020_workshops', 'CVPR2019_workshops', 'CVPR2018_workshops', 'CVPR2017_workshops', 'CVPR2016_workshops', 'CVPR2015_workshops',
     'ICCV2019_workshops', 'ICCV2017_workshops', 'ICCV2015_workshops',
-    'ECCV2018_workshops'
+    'ECCV2018_workshops',
+    'WACV2021_workshops', 'WACV2020_workshops',
 ]
 
 
@@ -26,7 +28,7 @@ def main():
         if 'workshop' in conf_id.lower():
             fetch_workshop_papers(db_manager, base_url, conf_id)
         else:
-            list_url = base_url + conf_id + '.py'
+            list_url = base_url + conf_id
             fetch_papers(db_manager, base_url, list_url, conf_id, 'Main', conf_id)
         db_manager.write_db()
 
@@ -47,11 +49,25 @@ def fetch_papers(db_manager: DBManager,
         response = url.read()
     soup = BeautifulSoup(response, 'html.parser')
     papers_meta_list1 = soup.find_all('dt')
-    page_urls_list = [base_url + m.find('a').get('href') for m in papers_meta_list1]
+    page_urls_list = []
+    for m in papers_meta_list1:
+        link = m.find('a').get('href')
+        tmp_base_url = base_url
+        if not link.startswith('..'):
+            base_parts = base_url.split('/')
+            tmp_base_url = '/'.join(base_parts[:-2])
+        page_urls_list.append(tmp_base_url + link)
     titles_list = [str(m.find('a').string) for m in papers_meta_list1]
     papers_meta_list2 = soup.find_all('dd')
     authors_list = [format_authors(m) for m in papers_meta_list2[::2]]
-    pdf_urls_list = [base_url + m.find('a').get('href') for m in papers_meta_list2[1::2]]
+    pdf_urls_list = []
+    for m in papers_meta_list2[1::2]:
+        link = m.find('a').get('href')
+        tmp_base_url = base_url
+        if not link.startswith('..'):
+            base_parts = base_url.split('/')
+            tmp_base_url = '/'.join(base_parts[:-2])
+        pdf_urls_list.append(tmp_base_url + link)
     dates_list = [format_date(m.find('div', {'class', 'bibref'})) for m in papers_meta_list2[1::2]]
 
     if (len(page_urls_list) == len(pdf_urls_list) and
@@ -79,18 +95,25 @@ def fetch_workshop_papers(db_manager: DBManager,
                           conf_id: str) -> None:
     """ Fetches data from workshop papers. """
     main_conf_id = conf_id.replace('_workshops', '')
-    page_url = base_url + conf_id + '/menu.py'
+    page_url = base_url + conf_id + '/menu'
     print('Workshop: ' + page_url)
     with urllib.request.urlopen(page_url) as url:
         response = url.read()
     soup = BeautifulSoup(response, 'html.parser')
     workshops_meta_list = soup.find_all('dd')
-    workshop_ids_list = [m.find('a').get('href').replace('.py', '').replace(' ', '_') for m in workshops_meta_list]
+    workshop_ids_list = []
+    for m in workshops_meta_list:
+        id_link = m.find('a').get('href')
+        if '.py' in id_link:
+            id_link = id_link.replace('.py', '').replace(' ', '_')
+        else:
+            id_link = id_link.split('/')[-1]
+        workshop_ids_list.append(id_link)
     workshop_names_list = [str(m.find('a').string) for m in workshops_meta_list]
     workshop_names_list = [conf_id + ' - ' + n for n in workshop_names_list]
     for i in range(len(workshop_names_list)):
         workshop_base_url = base_url + conf_id + '/'
-        list_url = workshop_base_url + workshop_ids_list[i] + '.py'
+        list_url = workshop_base_url + workshop_ids_list[i]
         conf_sub_id = workshop_ids_list[i]
         conf_sub_id = conf_sub_id[conf_sub_id.find('_')+1:]
         if conf_sub_id.lower() == '../menu':
@@ -122,11 +145,19 @@ def format_authors(authors: bs4.element.Tag) -> List[str]:
 
 def format_date(bibtex_entry: bs4.element.Tag) -> datetime.datetime:
     """ Gets the date from the bibtex entry. """
-    lines = [str(c.string).replace('\n', '') for c in bibtex_entry.contents]
+    cont = bibtex_entry.contents
+    if len(cont) == 1:
+        cont = cont[0].split('\n')
+    lines = []
+    for c in cont:
+        try:
+            lines.append(c.replace('\n', ''))
+        except TypeError:
+            continue
     for l in lines:
-        if l.startswith('month'):
+        if l.strip().startswith('month'):
             month_line = l
-        elif l.startswith('year'):
+        elif l.strip().startswith('year'):
             year_line = l
     start = month_line.find('{')
     end = month_line.find('}')
