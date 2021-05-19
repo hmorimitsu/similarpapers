@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # global settings
 # -----------------------------------------------------------------------------
 class Config(object):
-    minimum_year = 2015
+    minimum_year = 2016
     include_workshop_papers = True
     suffix = '_' + str(minimum_year)
     suffix += '_wshop' if include_workshop_papers else ''
