@@ -9,13 +9,14 @@ from typing import List
 sys.path.append('../')
 from db_manager import DBManager
 
-CONF_LINKS = ['AAAI/aaai20contents.php',
+CONF_LINKS = ['AAAI/aaai21contents.php'
+              'AAAI/aaai20contents.php',
               'AAAI/aaai19contents.php',
               'AAAI/aaai18contents.php',
               'AAAI/aaai17contents.php',
               'AAAI/aaai16contents.php',
               'AAAI/aaai15contents.php']
-CONF_NAMES = ['AAAI2020', 'AAAI2019', 'AAAI2018', 'AAAI2017', 'AAAI2016', 'AAAI2015']
+CONF_NAMES = ['AAAI2021', 'AAAI2020', 'AAAI2019', 'AAAI2018', 'AAAI2017', 'AAAI2016', 'AAAI2015']
 
 
 def main() -> None:
@@ -43,7 +44,12 @@ def fetch_papers(db_manager: DBManager,
     with urllib.request.urlopen(list_url) as url:
         response = url.read()
     soup = BeautifulSoup(response, 'html.parser')
-    if conf_year in [2020]:
+    if conf_year in [2021]:
+        contents_list = soup.find_all('a')
+        issues_links = [c.get('href') for c in contents_list]
+        issues_links = [i for i in issues_links if i.startswith('aaai21-issue') and not '#' in i]
+        issues_links = issues_links[:-1]  # Remove student papers
+    elif conf_year in [2020]:
         contents_list = soup.find_all('a')
         issues_links = [c.get('href') for c in contents_list]
         issues_links = [i for i in issues_links if i.startswith('aaai20contents-issue') and not '#' in i]
@@ -81,14 +87,24 @@ def fetch_papers(db_manager: DBManager,
                 pid = db_manager.create_paper_id(conf_id, conf_sub_id, titles_list[i])
                 if not db_manager.exists(pid):
                     try:
-                        if not conf_year in [2020, 2019]:
+                        if not conf_year in [2021, 2020, 2019]:
                             page_url = page_url.replace('/view/', '/viewPaper/')
                         page_url = page_url.replace('http://', 'https://')
-                        print(page_url)
                         with urllib.request.urlopen(page_url) as url:
                             response2 = url.read()
                         soup2 = BeautifulSoup(response2, 'html.parser')
-                        if conf_year in [2020, 2019]:
+                        if conf_year in [2021]:
+                            try:
+                                pdf_url = soup2.find('a', {'class': 'obj_galley_link'}).get('href')
+                            except AttributeError:
+                                # This error happens when a paper does not have a correct page for some reason
+                                continue
+                            summary = soup2.find('section', {'class': 'item abstract'})
+                            if summary is None:
+                                summary = ''
+                            else:
+                                summary = flatten_content_list(summary.contents, remove_tags=['abstract'])
+                        elif conf_year in [2020, 2019]:
                             try:
                                 pdf_url = soup2.find('a', {'class': 'obj_galley_link'}).get('href')
                             except AttributeError:
@@ -124,18 +140,18 @@ def fetch_papers(db_manager: DBManager,
                 len(titles_list)))
 
 
-def flatten_content_list(content_list: List[bs4.element.NavigableString]) -> str:
+def flatten_content_list(content_list: List[bs4.element.NavigableString], remove_tags=[]) -> str:
     """ Tranforms a list of NavigableString into a string. """
     out = ''
     for c in content_list:
         stack = [c]
         while len(stack) > 0:
             tag = stack.pop()
-            if tag.string is not None:
+            if tag.string is not None and tag.string.lower() not in remove_tags:
                 out += tag.string.replace('\n', ' ').replace('  ', '')
-            else:
+            elif hasattr(tag, 'contents'):
                 stack.extend(tag.contents)
-    return out
+    return out.strip()
 
 
 def format_authors(authors: str) -> List[str]:
