@@ -9,8 +9,14 @@ from typing import List
 sys.path.append('../')
 from db_manager import DBManager
 
-CONF_NAMES = ['ICML2022', 'ICML2021', 'ICML2020', 'ICML2019', 'ICML2018', 'ICML2017', 'ICML2016', 'ICML2015']
-PMLR_VOLUMES = [162, 139, 119, 97, 80, 70, 48, 37]
+CONF_NAMES = [
+    'AISTATS2022', 'AISTATS2021', 'AISTATS2020', 'AISTATS2019', 'AISTATS2018', 'AISTATS2017'
+    'ICML2022', 'ICML2021', 'ICML2020', 'ICML2019', 'ICML2018', 'ICML2017', 'ICML2016', 'ICML2015'
+]
+PMLR_VOLUMES = [
+    151, 130, 108, 89, 84, 54,
+    162, 139, 119, 97, 80, 70, 48, 37
+]
 
 
 def main() -> None:
