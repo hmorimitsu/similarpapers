@@ -38,6 +38,13 @@ def main():
             soup = BeautifulSoup(response, 'html.parser')
             days_links = [str(m.find('a').get('href')) for m in soup.find_all('dd')]
             days_links = [d[d.find('?'):] for d in days_links]
+            all_days = [d for d in days_links if 'day=all' in d]
+            if len(all_days) == 1:
+                days_links = all_days
+            else:
+                days_links = [d for d in days_links if len(d) > 1]
+                if len(days_links) == 0:
+                    days_links = ['']
             for dl in days_links:
                 fetch_papers(db_manager, base_url, list_url+dl, conf_id, 'Main', conf_id)
         db_manager.write_db()
