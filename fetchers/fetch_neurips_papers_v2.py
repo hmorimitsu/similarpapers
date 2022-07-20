@@ -10,8 +10,8 @@ sys.path.append('../')
 from db_manager import DBManager
 
 
-CONF_LINKS = ['paper/2020']
-CONF_NAMES = ['NeurIPS2020']
+CONF_LINKS = ['paper/2021', 'paper/2020']
+CONF_NAMES = ['NeurIPS2021', 'NeurIPS2020']
 
 
 def main() -> None:
