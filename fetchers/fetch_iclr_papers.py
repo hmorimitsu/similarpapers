@@ -10,11 +10,19 @@ sys.path.append('../')
 from db_manager import DBManager
 
 CONF_NAMES = [
-    'ICLR2021', 'ICLR2020', 'ICLR2019', 'ICLR2018', 'ICLR2017', 'ICLR2016', 'ICLR2015',
+    'ICLR2022', 'ICLR2021', 'ICLR2020', 'ICLR2019', 'ICLR2018', 'ICLR2017', 'ICLR2016', 'ICLR2015',
     'ICLR2018_workshop', 'ICLR2017_workshop',
     'ICLR2016_workshop', 'ICLR2015_workshop']
 # ICLR2019_workshop is not included because it is hard to fetch, as each workshop has its own website
 LIST_LINKS = {
+    'ICLR2022': [
+        'html/ICLR2022_oral_1.html', 'html/ICLR2022_oral_2.html',
+        'html/ICLR2022_spotlight_1.html', 'html/ICLR2022_spotlight_2.html', 'html/ICLR2022_spotlight_3.html', 'html/ICLR2022_spotlight_4.html',
+        'html/ICLR2022_poster_1.html', 'html/ICLR2022_poster_2.html', 'html/ICLR2022_poster_3.html', 'html/ICLR2022_poster_4.html', 'html/ICLR2022_poster_5.html',
+        'html/ICLR2022_poster_6.html', 'html/ICLR2022_poster_7.html', 'html/ICLR2022_poster_8.html', 'html/ICLR2022_poster_9.html', 'html/ICLR2022_poster_10.html',
+        'html/ICLR2022_poster_11.html', 'html/ICLR2022_poster_12.html', 'html/ICLR2022_poster_13.html', 'html/ICLR2022_poster_14.html', 'html/ICLR2022_poster_15.html',
+        'html/ICLR2022_poster_16.html', 'html/ICLR2022_poster_17.html', 'html/ICLR2022_poster_18.html'
+    ],
     'ICLR2021': ['html/ICLR2021_oral.html', 'html/ICLR2021_spotlight.html', 'html/ICLR2021_poster.html'],
     'ICLR2020': ['html/ICLR2020_oral.html', 'html/ICLR2020_spotlight.html', 'html/ICLR2020_poster.html'],
     'ICLR2019': 'https://iclr.cc/Conferences/2019/Schedule',
@@ -27,6 +35,7 @@ LIST_LINKS = {
     'ICLR2016_workshop': 'https://iclr.cc/archive/www/2016.html',
     'ICLR2015_workshop': 'https://iclr.cc/archive/www/doku.php%3Fid=iclr2015:accepted-main.html'
 }
+CONF_NAMES = ['ICLR2022']
 
 
 def main() -> None:
@@ -55,13 +64,13 @@ def fetch_papers(db_manager: DBManager,
     print(list_url)
     conf_year = int(conf_id[-4:])
     papers_meta_list = get_meta_list(conf_id, conf_sub_id, list_url)
-    if conf_year in [2020, 2021]:
+    if conf_year in [2020, 2021, 2022]:
         titles_list = [flatten_content_list(m.find_all('a')[0].contents) for m in papers_meta_list]
         authors_list = [format_authors(m.find('div', {'class': 'note-authors'}).find_all('a'), conf_year) for m in papers_meta_list]
         page_urls_list = [m.find_all('a')[0].get('href') for m in papers_meta_list]
         pdf_urls_list = [m.find_all('a')[1].get('href') for m in papers_meta_list]
         summary_list = [extract_abstract(m, conf_year) for m in papers_meta_list]
-    if conf_year in [2019, 2018]:
+    elif conf_year in [2019, 2018]:
         for i in range(len(papers_meta_list)-1, -1, -1):
             if papers_meta_list[i].find('a', {'title': 'PDF'}) is None:
                 del papers_meta_list[i]
@@ -95,7 +104,7 @@ def fetch_papers(db_manager: DBManager,
             if not db_manager.exists(pid):
                 try:
                     print(page_url)
-                    if conf_year in [2020, 2021]:
+                    if conf_year in [2020, 2021, 2022]:
                         pdf_url = pdf_urls_list[i]
                         summary = summary_list[i]
                     else:
@@ -134,7 +143,7 @@ def fetch_papers(db_manager: DBManager,
 
 def extract_abstract(meta: bs4.element.Tag,
                      conf_year: int) -> str:
-    if conf_year in [2020, 2021]:
+    if conf_year in [2020, 2021, 2022]:
         titles = meta.find_all('strong', {'class': 'note-content-field'})
         # print(titles)
         for i, t in enumerate(titles):
@@ -160,9 +169,9 @@ def flatten_content_list(content_list: List[bs4.element.NavigableString]) -> str
 def format_authors(authors: str,
                    conf_year: int) -> List[str]:
     """ Tranforms the raw authors string into a list of authors. """
-    if conf_year in [2020, 2021]:
+    if conf_year in [2020, 2021, 2022]:
         authors_out = [str(a.text).strip() for a in authors]
-    if conf_year in [2019, 2018]:
+    elif conf_year in [2019, 2018]:
         authors_out = authors.replace(' · ', ',')
         authors_out = authors_out.split(',')
         authors_out = [a.strip() for a in authors_out]
@@ -185,7 +194,7 @@ def get_meta_list(conf_id: str,
                   conf_sub_id: str,
                   list_url: str) -> List[bs4.element.Tag]:
     conf_year = int(conf_id[-4:])
-    if conf_year in [2020, 2021]:
+    if conf_year in [2020, 2021, 2022]:
         responses = []
         for url in list_url:
             with open(url, 'r') as f:
