@@ -35,7 +35,6 @@ LIST_LINKS = {
     'ICLR2016_workshop': 'https://iclr.cc/archive/www/2016.html',
     'ICLR2015_workshop': 'https://iclr.cc/archive/www/doku.php%3Fid=iclr2015:accepted-main.html'
 }
-CONF_NAMES = ['ICLR2022']
 
 
 def main() -> None:

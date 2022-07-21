@@ -9,7 +9,7 @@ from typing import List
 from db_manager import DBManager
 
 CONFERENCES = [
-    # 'ACCV2020',
+    'ACCV2020',
     'CVPR2022', 'CVPR2021', 'CVPR2020', 'CVPR2019', 'CVPR2018', 'CVPR2017', 'CVPR2016', 'CVPR2015',
     'ICCV2021', 'ICCV2019', 'ICCV2017', 'ICCV2015',
     'ECCV2020', 'ECCV2018',
