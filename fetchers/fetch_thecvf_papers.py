@@ -9,14 +9,16 @@ from typing import List
 from db_manager import DBManager
 
 CONFERENCES = [
-    'CVPR2020', 'CVPR2019', 'CVPR2018', 'CVPR2017', 'CVPR2016', 'CVPR2015',
-    'ICCV2019', 'ICCV2017', 'ICCV2015',
-    'ECCV2018',
-    'WACV2021', 'WACV2020',
-    'CVPR2020_workshops', 'CVPR2019_workshops', 'CVPR2018_workshops', 'CVPR2017_workshops', 'CVPR2016_workshops', 'CVPR2015_workshops',
+    # 'ACCV2020',
+    'CVPR2022', 'CVPR2021', 'CVPR2020', 'CVPR2019', 'CVPR2018', 'CVPR2017', 'CVPR2016', 'CVPR2015',
+    'ICCV2021', 'ICCV2019', 'ICCV2017', 'ICCV2015',
+    'ECCV2020', 'ECCV2018',
+    'WACV2022', 'WACV2021', 'WACV2020',
+    'ACCV2020_workshops',
+    'CVPR2022_workshops', 'CVPR2021_workshops', 'CVPR2020_workshops', 'CVPR2019_workshops', 'CVPR2018_workshops', 'CVPR2017_workshops', 'CVPR2016_workshops', 'CVPR2015_workshops',
     'ICCV2019_workshops', 'ICCV2017_workshops', 'ICCV2015_workshops',
     'ECCV2018_workshops',
-    'WACV2021_workshops', 'WACV2020_workshops',
+    'WACV2022_workshops', 'WACV2021_workshops', 'WACV2020_workshops',
 ]
 
 
@@ -29,7 +31,20 @@ def main():
             fetch_workshop_papers(db_manager, base_url, conf_id)
         else:
             list_url = base_url + conf_id
-            fetch_papers(db_manager, base_url, list_url, conf_id, 'Main', conf_id)
+            with urllib.request.urlopen(list_url) as url:
+                response = url.read()
+            soup = BeautifulSoup(response, 'html.parser')
+            days_links = [str(m.find('a').get('href')) for m in soup.find_all('dd')]
+            days_links = [d[d.find('?'):] for d in days_links]
+            all_days = [d for d in days_links if 'day=all' in d]
+            if len(all_days) == 1:
+                days_links = all_days
+            else:
+                days_links = [d for d in days_links if len(d) > 1]
+                if len(days_links) == 0:
+                    days_links = ['']
+            for dl in days_links:
+                fetch_papers(db_manager, base_url, list_url+dl, conf_id, 'Main', conf_id)
         db_manager.write_db()
 
 
@@ -52,23 +67,30 @@ def fetch_papers(db_manager: DBManager,
     page_urls_list = []
     for m in papers_meta_list1:
         link = m.find('a').get('href')
-        tmp_base_url = base_url
-        if not link.startswith('..'):
-            base_parts = base_url.split('/')
-            tmp_base_url = '/'.join(base_parts[:-2])
-        page_urls_list.append(tmp_base_url + link)
+        if link[0] == '/':
+            link = link[1:]
+        page_urls_list.append(base_url + link)
     titles_list = [str(m.find('a').string) for m in papers_meta_list1]
     papers_meta_list2 = soup.find_all('dd')
-    authors_list = [format_authors(m) for m in papers_meta_list2[::2]]
+    print(list_url, 'day=all' in list_url)
+    if 'day=all' in list_url:
+        papers_meta_list2 = papers_meta_list2[1:]
+        authors_list = [format_authors(m) for m in papers_meta_list2[::2]]
+        authors_list = authors_list[:-1]
+    else:
+        authors_list = [format_authors(m) for m in papers_meta_list2[::2]]
     pdf_urls_list = []
     for m in papers_meta_list2[1::2]:
         link = m.find('a').get('href')
-        tmp_base_url = base_url
-        if not link.startswith('..'):
-            base_parts = base_url.split('/')
-            tmp_base_url = '/'.join(base_parts[:-2])
-        pdf_urls_list.append(tmp_base_url + link)
+        if link[0] == '/':
+            link = link[1:]
+        pdf_urls_list.append(base_url + link)
     dates_list = [format_date(m.find('div', {'class', 'bibref'})) for m in papers_meta_list2[1::2]]
+    print(titles_list[0])
+    print(authors_list[0])
+    print(pdf_urls_list[0])
+    print(dates_list[0])
+    sds
 
     if (len(page_urls_list) == len(pdf_urls_list) and
             len(page_urls_list) == len(authors_list) and
@@ -118,7 +140,7 @@ def fetch_workshop_papers(db_manager: DBManager,
         conf_sub_id = conf_sub_id[conf_sub_id.find('_')+1:]
         if conf_sub_id.lower() == '../menu':
             continue
-        fetch_papers(db_manager, workshop_base_url, list_url, main_conf_id, conf_sub_id, workshop_names_list[i])
+        fetch_papers(db_manager, base_url, list_url, main_conf_id, conf_sub_id, workshop_names_list[i])
         db_manager.write_db()
 
 
@@ -172,12 +194,13 @@ def format_date(bibtex_entry: bs4.element.Tag) -> datetime.datetime:
 def get_abstract(page_url):
     """ Opens paper page and retrieves the abstract. """
     try:
+        print('page_url', page_url)
         with urllib.request.urlopen(page_url) as url:
             response = url.read()
         soup = BeautifulSoup(response, 'html.parser')
         abstract = flatten_content_list(soup.find('div', {'id': 'abstract'}).contents)
         abstract = abstract.replace('\n', '')
-        return abstract
+        return abstract.strip()
     except (urllib.error.HTTPError, urllib.error.URLError):
         print('Cannot open page', page_url)
         return 'Abstract not found.'
