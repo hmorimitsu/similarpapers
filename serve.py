@@ -72,6 +72,9 @@ def encode_json(ps, n=10, send_images=True, send_abstracts=True):
         struct['pdf_link'] = p['pdf_url']
         struct['conf_name'] = p['conf_name']
         struct['composed_conf_id'] = p['composed_conf_id']
+        struct['code_link'] = ''
+        if 'code_link' in p:
+            struct['code_link'] = p['code_link']
         if send_abstracts:
             struct['abstract'] = p['summary']
 

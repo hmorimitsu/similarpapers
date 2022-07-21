@@ -93,8 +93,13 @@ function addPapers(num, dynamic) {
       }(p.pid)); // closer over the paper id
     }
 
+    if (p.code_link != '') {
+      let codediv = headerdiv.append('div').classed('col-md-auto my-auto', true);
+      codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="fa fa-code fa-2x"></i><br>Source code</center>');
+    }
+
     let pdfdiv = headerdiv.append('div').classed('col-md-auto my-auto', true);
-    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="fa fa-file-pdf-o fa-3x"></i><br>PDF</center>');
+    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="fa fa-file-pdf fa-4x"></i><br>PDF</center>');
 
     // col = ldiv.append('div').classed('col-sm', true);
     // col.append('a').classed('btn btn-secondary', true).attr('href', p.pdf_link).attr('target', '_blank').html('pdf');
