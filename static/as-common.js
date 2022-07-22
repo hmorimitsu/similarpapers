@@ -97,14 +97,14 @@ function addPapers(num, dynamic) {
 
     if (p.code_link != '') {
       let codediv = rightdiv.append('div').classed('col-md-auto my-auto align-text-bottom', true);
-      codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="fa fa-code fa-2x"></i><br>Source code</center>');
+      codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="bi-code" style="font-size: 3rem"></i><br>Source code</center>');
     }
 
     let bibdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
-    bibdiv.append('a').attr('href', '#bib_' + p.bib_id).attr('data-toggle', 'collapse').attr('role', 'button').attr('aria-expanded', 'false').attr('aria-controls', 'collapseExample').html('<center><i class="fa fa-quote-left fa-2x"></i><br>bibtex</center>');
+    bibdiv.append('a').attr('href', '#bib_' + p.bib_id).attr('data-toggle', 'collapse').attr('role', 'button').attr('aria-expanded', 'false').attr('aria-controls', 'collapseExample').html('<center><i class="bi-quote" style="font-size: 3rem"></i><br>bibtex</center>');
 
     let pdfdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
-    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="fa fa-file-pdf fa-4x"></i><br>PDF</center>');
+    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="bi-filetype-pdf" style="font-size: 3rem"></i><br>PDF</center>');
 
     let bib_text = '@inproceedings{' + p.bib_id + ',\n' +
     '  title={' + p.title + '},\n' +
@@ -119,12 +119,12 @@ function addPapers(num, dynamic) {
     let bibcolbuttondiv = bibcoldiv.append('div');
     let bibcolrowdiv = bibcolbuttondiv.append('div').classed('row', true);
     let bibcolcopybtndiv = bibcolrowdiv.append('div').classed('col-md-auto my-auto', true);
-    let copy_btn = bibcolcopybtndiv.append('button').classed('btn btn-dark', true).attr('type', 'submit').attr('id', 'copy_'+p.bib_id).html('<i class="fa fa-copy"></i> Copy bibtex');
+    let copy_btn = bibcolcopybtndiv.append('button').classed('btn btn-dark', true).attr('type', 'submit').attr('id', 'copy_'+p.bib_id).html('<i class="bi-clipboard" style="font-size: 1rem"></i> Copy bibtex');
     copy_btn.on('click', function(){
       let text = document.getElementById('bib_text_' + p.bib_id).value;
       navigator.clipboard.writeText(text)
         .then(() => {
-          document.getElementById('copy_' + p.bib_id).innerHTML = '<i class="fa fa-copy"></i> Copied';
+          document.getElementById('copy_' + p.bib_id).innerHTML = '<i class="bi-clipboard-check" style="font-size: 1rem"></i> Copied';
         })
         .catch(err => {
           alert('Error. Could not copy the bibtex.', err);
@@ -132,7 +132,7 @@ function addPapers(num, dynamic) {
     });
     
     let bibcolsavebtndiv = bibcolrowdiv.append('div').classed('col-md-auto my-auto', true);
-    bibcolsavebtndiv.append('a').classed('btn btn-dark', true).attr('download', p.bib_id + '.bib').attr('href', 'data:text/plain;charset=utf-8,' + bib_text).html('<i class="fa fa-download"></i> Save bibtex to file');
+    bibcolsavebtndiv.append('a').classed('btn btn-dark', true).attr('download', p.bib_id + '.bib').attr('href', 'data:text/plain;charset=utf-8,' + bib_text).html('<i class="bi-download" style="font-size: 1rem"></i> Save bibtex to file');
 
     if(typeof p.abstract !== 'undefined') {
       let abdiv = div.append('div').classed('my-2', true).html(p.abstract);

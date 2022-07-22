@@ -35,9 +35,7 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-
-<!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/62f5f9767f.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
 <!-- CSS -->
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='similarpapers.css') }}">
@@ -59,7 +57,7 @@
             <a class="nav-link" href="{{ url_for('info') }}">Site info and policy</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/hmorimitsu/similarpapers" target="_blank"><i class="fa fa-github"></i> See on GitHub</a>
+            <a class="nav-link" href="https://github.com/hmorimitsu/similarpapers" target="_blank"><i class="bi-github" style="font-size: 1rem"></i> See on GitHub</a>
           </li>
         </ul>
       </div>
