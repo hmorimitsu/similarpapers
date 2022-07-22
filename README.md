@@ -3,7 +3,7 @@
 
 This code is a modification of the nice [arxiv-sanity](https://github.com/karpathy/arxiv-sanity-preserver) project. It provides a web interface to browse and find similar papers from top conferences in Computer Vision, Machine Learning and Artificial Intelligence.  This code is currently running live at [similarpapers.com](https://similarpapers.com/).
 
-![user interface](ui.jpg)
+![user interface](ui.png)
 
 ### Getting the code
 
