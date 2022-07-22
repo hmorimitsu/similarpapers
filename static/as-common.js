@@ -97,14 +97,14 @@ function addPapers(num, dynamic) {
 
     if (p.code_link != '') {
       let codediv = rightdiv.append('div').classed('col-md-auto my-auto align-text-bottom', true);
-      codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="bi-code" style="font-size: 3rem"></i><br>Source code</center>');
+      codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="bi-code" style="font-size: 3rem"></i><br>code</center>');
     }
 
     let bibdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
     bibdiv.append('a').attr('href', '#bib_' + p.bib_id).attr('data-toggle', 'collapse').attr('role', 'button').attr('aria-expanded', 'false').attr('aria-controls', 'collapseExample').html('<center><i class="bi-quote" style="font-size: 3rem"></i><br>bibtex</center>');
 
     let pdfdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
-    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="bi-filetype-pdf" style="font-size: 3rem"></i><br>PDF</center>');
+    pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="bi-filetype-pdf" style="font-size: 5rem"></i></center>');
 
     let bib_text = '@inproceedings{' + p.bib_id + ',\n' +
     '  title={' + p.title + '},\n' +
