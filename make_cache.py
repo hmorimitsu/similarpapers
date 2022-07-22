@@ -60,7 +60,7 @@ for pid,p in db.items():
     bib_id_title = bib_id_title.split(' ')
     bib_id_title = ''.join(bib_id_title[:3])
     p['bib_id'] = f'{p["authors"][0].split(" ")[-1]}{p["published"][:4]}{bib_id_title}'
-    bib_authors = [a.replace('.', '. ').split(' ') for a in p["authors"]]
+    bib_authors = [a.replace('\n', '').replace('.', '. ').split(' ') for a in p["authors"]]
     bib_authors = [[a.strip() for a in authors_list if len(a) > 0] for authors_list in bib_authors]
     for authors_list in bib_authors:
         for i, aut in enumerate(authors_list[1:-1]):
