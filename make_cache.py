@@ -9,10 +9,34 @@ creates db2.p, which can be read by the server.
 import time
 import pickle
 import dateutil.parser
+import string
 
 from utils import safe_pickle_dump, Config, load_json_db
 
 CACHE = {}
+IGNORE_WORD = [
+    'about', 'am', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'do', 'does', 'for', 'from', 'he', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'she', 'so', 'the', 'they', 'to', 'under', 'using', 'via', 'we', 'with', 'without', 'you'
+]
+
+
+def clean_title(title):
+    # Remove punctuation code from: https://datagy.io/python-remove-punctuation-from-string/
+    title = title.translate(str.maketrans('', '', string.punctuation))
+
+    # TODO: use a smarter text processing technique
+
+    title_words = [w for w in title.split(' ') if len(w) > 1 and w.lower() not in IGNORE_WORD]
+    title = ' '.join([s for s in title.split(' ') if len(s) > 1])
+    return ' '.join(title_words)
+
+
+def format_booktitle(conf_id, conf_name):
+    if conf_id[-1] == 'W':
+        conf_id = conf_id[:-1]
+    conf_name = conf_name.replace('_workshop', ' workshop')
+    conf_name = conf_name.replace(conf_id, conf_id[:-4])
+    return conf_name
+
 
 print('loading the paper database from json files in', Config.json_dir)
 db = load_json_db()
@@ -28,9 +52,23 @@ idf = meta['idf']
 
 print('decorating the database with additional information...')
 for pid,p in db.items():
+    p['year'] = p['conf_id'][-4:]
     p['pid'] = pid
     p['conf_id'] = p['conf_id'] + ('W' if p['is_workshop'] else '')
     p['composed_conf_id'] = p['conf_id'] + ('_'+p['conf_sub_id'] if p['is_workshop'] else '')
+    bib_id_title = clean_title(p['title'])
+    bib_id_title = bib_id_title.split(' ')
+    bib_id_title = ''.join(bib_id_title[:3])
+    p['bib_id'] = f'{p["authors"][0].split(" ")[-1]}{p["published"][:4]}{bib_id_title}'
+    bib_authors = [a.replace('.', '. ').split(' ') for a in p["authors"]]
+    bib_authors = [[a.strip() for a in authors_list if len(a) > 0] for authors_list in bib_authors]
+    for authors_list in bib_authors:
+        for i, aut in enumerate(authors_list[1:-1]):
+            authors_list[i+1] = f'{aut[0]}.'
+    bib_authors = [f'{a[-1]}, {" ".join(a[:-1])}' for a in bib_authors]
+    bib_authors = ' and '.join(bib_authors)
+    p['bib_authors'] = bib_authors
+    p['bib_booktitle'] = format_booktitle(p['conf_id'], p['conf_name'])
 
 print('computing min/max time for all papers...')
 tts = [time.mktime(dateutil.parser.parse(p['published']).timetuple()) for pid,p in db.items()]

@@ -93,16 +93,46 @@ function addPapers(num, dynamic) {
       }(p.pid)); // closer over the paper id
     }
 
+    let rightdiv = headerdiv.append('div').classed('row', true);
+
     if (p.code_link != '') {
-      let codediv = headerdiv.append('div').classed('col-md-auto my-auto', true);
+      let codediv = rightdiv.append('div').classed('col-md-auto my-auto align-text-bottom', true);
       codediv.append('a').attr('href', p.code_link).attr('target', '_blank').html('<center><i class="fa fa-code fa-2x"></i><br>Source code</center>');
     }
 
-    let pdfdiv = headerdiv.append('div').classed('col-md-auto my-auto', true);
+    let bibdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
+    bibdiv.append('a').attr('href', '#bib_' + p.bib_id).attr('data-toggle', 'collapse').attr('role', 'button').attr('aria-expanded', 'false').attr('aria-controls', 'collapseExample').html('<center><i class="fa fa-quote-left fa-2x"></i><br>bibtex</center>');
+
+    let pdfdiv = rightdiv.append('div').classed('col-md-auto my-auto', true);
     pdfdiv.append('a').attr('href', p.pdf_link).attr('target', '_blank').html('<center><i class="fa fa-file-pdf fa-4x"></i><br>PDF</center>');
 
-    // col = ldiv.append('div').classed('col-sm', true);
-    // col.append('a').classed('btn btn-secondary', true).attr('href', p.pdf_link).attr('target', '_blank').html('pdf');
+    let bib_text = '@inproceedings{' + p.bib_id + ',\n' +
+    '  title={' + p.title + '},\n' +
+    '  author={' + p.bib_authors + '},\n' +
+    '  booktitle={' + p.bib_booktitle + '},\n' +
+    '  year={' + p.year + '}\n' +
+    '}';
+
+    let bibcoldiv = div.append('div').classed('collapse', true).attr('id', 'bib_' + p.bib_id);
+    let bibcolinnerdiv = bibcoldiv.append('textarea').classed('form-control', true).attr('onclick', 'this.focus();this.select()').attr('readonly', true).attr('rows', '6').attr('id', 'bib_text_' + p.bib_id).html(bib_text);
+
+    let bibcolbuttondiv = bibcoldiv.append('div');
+    let bibcolrowdiv = bibcolbuttondiv.append('div').classed('row', true);
+    let bibcolcopybtndiv = bibcolrowdiv.append('div').classed('col-md-auto my-auto', true);
+    let copy_btn = bibcolcopybtndiv.append('button').classed('btn btn-dark', true).attr('type', 'submit').attr('id', 'copy_'+p.bib_id).html('<i class="fa fa-copy"></i> Copy bibtex');
+    copy_btn.on('click', function(){
+      let text = document.getElementById('bib_text_' + p.bib_id).value;
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          document.getElementById('copy_' + p.bib_id).innerHTML = '<i class="fa fa-copy"></i> Copied';
+        })
+        .catch(err => {
+          alert('Error. Could not copy the bibtex.', err);
+        });
+    });
+    
+    let bibcolsavebtndiv = bibcolrowdiv.append('div').classed('col-md-auto my-auto', true);
+    bibcolsavebtndiv.append('a').classed('btn btn-dark', true).attr('download', p.bib_id + '.bib').attr('href', 'data:text/plain;charset=utf-8,' + bib_text).html('<i class="fa fa-download"></i> Save bibtex to file');
 
     if(typeof p.abstract !== 'undefined') {
       let abdiv = div.append('div').classed('my-2', true).html(p.abstract);
