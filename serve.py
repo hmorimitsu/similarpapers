@@ -4,6 +4,7 @@ import argparse
 import dateutil.parser
 
 from flask import Flask, request, url_for, redirect, render_template
+from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
 
 from utils import isvalidid, Config
@@ -18,7 +19,7 @@ else:
     SECRET_KEY = 'devkey, should be in a file'
 app = Flask(__name__)
 app.config.from_object(__name__)
-limiter = Limiter(app, default_limits=["100000 per hour", "20000 per minute"])
+limiter = Limiter(app, key_func=get_remote_address, default_limits=["100000 per hour", "20000 per minute"])
 
 # -----------------------------------------------------------------------------
 # search/sort functionality
